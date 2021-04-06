@@ -148,17 +148,3 @@ SELECT
   FROM department d LEFT OUTER JOIN employee e
     ON d.dept_no = e.depart
  GROUP BY d.dept_no;
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
