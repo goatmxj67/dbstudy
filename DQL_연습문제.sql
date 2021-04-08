@@ -181,7 +181,7 @@ SELECT
                               FROM orders o);
 
 
--- 10. 고객별로 총 구매횟수를 조회하시오. 주문 이력이 없으면 0으로 조회하시오.
+-- 10. 고객별로 총 구매횟수를 조회하시오. 주문 이력이 없으면 0으로 조회하시오. 
 SELECT c.customer_id
      , c.customer_name
      , COUNT(o.order_id) AS 구매횟수
