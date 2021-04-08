@@ -1,5 +1,5 @@
 -- 1. 부서의 위치(location_id)가 1700 인 사원들의 employee_id, last_name, department_id, salary 를 조회한다.
--- 사용할 테이블 (departments, employees)
+-- 사용할 테이블 (departments, employees) 
 SELECT
        e.employee_id
      , e.last_name

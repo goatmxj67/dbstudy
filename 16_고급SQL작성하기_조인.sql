@@ -1,4 +1,4 @@
-CREATE TABLE department
+CREATE TABLE department 
 (
     dept_no NUMBER,
     dept_name VARCHAR2(10),
