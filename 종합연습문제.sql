@@ -1,6 +1,6 @@
 DROP TABLE BUYS;
 DROP TABLE USERS;
-
+ 
 -- 사용자(USERS) 테이블 생성
 CREATE TABLE USERS (
     USER_NO NUMBER,  -- 사용자번호
