@@ -20,6 +20,8 @@ public class MembersHandler {
 		System.out.println("1. 가입");
 		System.out.println("2. 탈퇴");
 		System.out.println("3. 수정");
+		System.out.println("4. 아이디 찾기");
+		System.out.println("5. 회원 검색");
 		System.out.println("==================");
 	}
 
@@ -40,6 +42,12 @@ public class MembersHandler {
 			case 3:
 				modify();
 				break;
+			case 4:
+				findID();
+				break;
+			case 5:
+				inquiryMember();
+				break;
 			}
 		}
 	}
@@ -48,10 +56,15 @@ public class MembersHandler {
 	public void join() {
 		System.out.print("신규 아이디 >>> ");
 		String mId = sc.next();
-		System.out.print("사용자명 >>> ");
-		String mName = sc.next();
 		System.out.print("이메일 >>> ");
 		String mEmail = sc.next();
+		// 일치하는 mId나 mEmail이 이미 DB에 있으면(SELECT) join() 메소드 종료
+		if (dao.doubleCheck(mId, mEmail)) {
+			System.out.println("이미 가입된 정보입니다. 다른 정보로 가입하세요.");
+			return;
+		}
+		System.out.print("사용자명 >>> ");
+		String mName = sc.next();
 
 		MembersDto dto = new MembersDto();
 		dto.setmId(mId);
@@ -68,6 +81,7 @@ public class MembersHandler {
 
 	}
 
+	// 탈퇴
 	public void leave() {
 		System.out.print("탈퇴할 아이디 >>> ");
 		String mId = sc.next();
@@ -87,6 +101,7 @@ public class MembersHandler {
 
 	}
 
+	// 수정
 	public void modify() {
 		System.out.print("수정할 회원의 아이디 >>> ");
 		String mId = sc.next();
@@ -105,6 +120,32 @@ public class MembersHandler {
 			System.out.println(mId + "님의 정보가 수정되었습니다.");
 		} else {
 			System.out.println(mId + "님의 정보수정이 실패했습니다.");
+		}
+	}
+
+	// 아이디 찾기
+	public void findID() {
+		System.out.print("가입 이메일 >>> ");
+		String mEmail = sc.next();
+
+		String mId = dao.findmIdBymEmail(mEmail);
+		if (mId != null) {
+			System.out.println("아이디는 " + mId + "입니다.");
+		} else {
+			System.out.println("일치하는 정보가 없습니다.");
+		}
+	}
+
+	// 회원 검색
+	public void inquiryMember() {
+		System.out.print("조회할 회원 아이디 >>> ");
+		String mId = sc.next();
+
+		MembersDto dto = dao.selectMembersDtoBymId(mId);
+		if (dto != null) {
+			System.out.println("조회결과: " + dto);
+		} else {
+			System.out.println(mId + " 아이디를 가진 회원이 없습니다.");
 		}
 	}
 
