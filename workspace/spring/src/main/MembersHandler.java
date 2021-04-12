@@ -18,6 +18,8 @@ public class MembersHandler {
 		System.out.println("=====회원관리=====");
 		System.out.println("0. 프로그램 종료");
 		System.out.println("1. 가입");
+		System.out.println("2. 탈퇴");
+		System.out.println("3. 수정");
 		System.out.println("==================");
 	}
 
@@ -32,7 +34,12 @@ public class MembersHandler {
 			case 1:
 				join();
 				break;
-
+			case 2:
+				leave();
+				break;
+			case 3:
+				modify();
+				break;
 			}
 		}
 	}
@@ -59,6 +66,46 @@ public class MembersHandler {
 			System.out.println(mId + "님의 가입이 실패했습니다.");
 		}
 
+	}
+
+	public void leave() {
+		System.out.print("탈퇴할 아이디 >>> ");
+		String mId = sc.next();
+
+		System.out.print("탈퇴할까요(y/n)? >>> ");
+		String yn = sc.next();
+		if (yn.equalsIgnoreCase("y")) {
+			int result = dao.deleteMembers(mId);
+			if (result > 0) {
+				System.out.println(mId + "님이 탈퇴되었습니다. 감사합니다.");
+			} else {
+				System.out.println(mId + "님이 탈퇴되지 않았습니다.");
+			}
+		} else {
+			System.out.println("탈퇴 작업이 취소되었습니다.");
+		}
+
+	}
+
+	public void modify() {
+		System.out.print("수정할 회원의 아이디 >>> ");
+		String mId = sc.next();
+		System.out.print("수정할 이름 >>> ");
+		String mName = sc.next();
+		System.out.print("수정할 이메일 >>> ");
+		String mEmail = sc.next();
+
+		MembersDto dto = new MembersDto();
+		dto.setmId(mId);
+		dto.setmName(mName);
+		dto.setmEmail(mEmail);
+
+		int result = dao.updateMembers(dto);
+		if (result > 0) {
+			System.out.println(mId + "님의 정보가 수정되었습니다.");
+		} else {
+			System.out.println(mId + "님의 정보수정이 실패했습니다.");
+		}
 	}
 
 }
