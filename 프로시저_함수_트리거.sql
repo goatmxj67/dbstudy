@@ -222,24 +222,49 @@ UPDATE employees SET salary = 25000 WHERE employee_id = 100;
 DROP TRIGGER trig1;
 DROP TRIGGER trig2;
 
+-- 문제.
+-- employees 테이블에서 삭제된 데이터는 퇴사자(retire) 테이블에 자동으로 저장되는
+-- 트리거를 작성하시오.
+--       INSERT     UPDATE      DELETE
+-- :OLD  NULL       수정전값    삭제전값
+-- :NEW  추가된값   수정후값    NULL
 
+-- 1. 퇴사자 테이블을 생성한다.
+--    retire_id, employee_id, last_name, department_id, hire_date, retire_date
+CREATE TABLE retire
+(
+    retire_id NUMBER,
+    employee_id NUMBER,
+    last_name VARCHAR2(25),
+    department_id NUMBER,
+    hire_date DATE,
+    retire_date DATE
+);
+ALTER TABLE retire ADD CONSTRAINT retire_pk PRIMARY KEY(retire_id);
 
+-- 2. retire_seq 시퀀스를 생성한다.
+CREATE SEQUENCE retire_seq NOCACHE;
 
+-- 3. 트리거를 생성한다.
+CREATE OR REPLACE TRIGGER retire_trig
+    AFTER  -- 삭제 이후에 동작하므로 삭제 이전의 데이터는 :OLD에 있다.
+    DELETE
+    ON employees
+    FOR EACH ROW
+BEGIN
+    INSERT INTO retire 
+        (retire_id, employee_id, last_name, department_id, hire_date, retire_date)
+    VALUES
+        (retire_seq.nextval, :OLD.employee_id, :OLD.last_name, :OLD.department_id, :OLD.hire_date, SYSDATE);
+END retire_trig;
 
+-- 4. 삭제를 통해 트리거 동작을 확인한다.
+DELETE FROM employees WHERE department_id = 50;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+SELECT retire_id
+     , employee_id
+     , last_name
+     , department_id
+     , hire_date
+     , retire_date
+  FROM retire;
