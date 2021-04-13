@@ -1,29 +1,28 @@
--- HR 계정의 EMPLOYEES 테이블을 복사하기
+-- HR 계정의 employees 테이블을 복사하기
 -- 테이블을 복사하면 PK, FK는 복사되지 않는다.
 CREATE TABLE employees
     AS (SELECT * FROM HR.employees);
 
 DESC user_constraints;  -- 제약조건을 저장하고 있는 데이터 사전
-
 SELECT *
   FROM user_constraints
  WHERE table_name = 'EMPLOYEES';
- 
+
 -- 복사한 테이블에 기본키(PK) 지정하기
 ALTER TABLE employees ADD CONSTRAINT employees_pk PRIMARY KEY(employee_id);
 
----------------------------------------
+----------------------------------
 
 -- PL/SQL
 
 -- 접속마다 최초 1회만 하면 된다.
 -- 결과를 화면에 띄우기
 -- 디폴트 SET SERVEROUTPUT OFF;
-SET SERVEROUTPUT ON;  
+SET SERVEROUTPUT ON;
 
 -- 기본 구성
 /*
-    DECLARE 
+    DECLARE
         변수 선언;
     BEGIN
         작업;
@@ -40,18 +39,17 @@ DECLARE
     my_name VARCHAR2(20);
     my_age NUMBER(3);
 BEGIN
-    -- 변수에 값을 대입(대입연산자 :=)
+    -- 변수에 값을 대입(대입연산자  :=)
     my_name := '에밀리';
     my_age := 30;
     DBMS_OUTPUT.PUT_LINE('내 이름은 ' || my_name || '입니다.');
     DBMS_OUTPUT.PUT_LINE('내 나이는 ' || my_age || '살입니다.');
 END;
 
+
 -- 변수 선언 (참조 변수)
 -- 기존의 칼럼의 타입을 그대로 사용한다.
--- 계정.테이블.칼럼%TYPE -> spring.employees.~~~ 하지만 같은 계정이면 계정 생략가능
-
-DESC employees;
+-- 계정.테이블.칼럼%TYPE
 
 DECLARE
     v_first_name EMPLOYEES.FIRST_NAME%TYPE;  -- v_first_name VARCHAR2(20);
@@ -66,13 +64,14 @@ BEGIN
     SELECT last_name INTO v_last_name
       FROM employees
      WHERE employee_id = 100;
-     */
+    */
     SELECT first_name, last_name
       INTO v_first_name, v_last_name
       FROM employees
      WHERE employee_id = 100;
     DBMS_OUTPUT.PUT_LINE(v_first_name || ' ' || v_last_name);
 END;
+
 
 -- IF문
 DECLARE
@@ -89,10 +88,11 @@ BEGIN
     ELSIF score >= 60 THEN
         grade := 'D';
     ELSE
-    grade := 'F';
+        grade := 'F';
     END IF;
     DBMS_OUTPUT.PUT_LINE('점수는 ' || score || '점이고, 학점은 ' || grade || '학점입니다.');
 END;
+
 
 -- CASE문
 DECLARE
@@ -106,40 +106,40 @@ BEGIN
         WHEN score >= 80 THEN
             grade := 'B';
         WHEN score >= 70 THEN
-            grade := 'C';   
+            grade := 'C';
         WHEN score >= 60 THEN
             grade := 'D';
         ELSE
             grade := 'F';
-     END CASE;
-        DBMS_OUTPUT.PUT_LINE('점수는 ' || score || '점이고, 학점은 ' || grade || '학점입니다.');
+    END CASE;
+    DBMS_OUTPUT.PUT_LINE('점수는 ' || score || '점이고, 학점은 ' || grade || '학점입니다.');
 END;
+
 
 -- 문제. 사원번호(employee_id)가 200인 사원의 연봉(salary)을 가져와서,
 -- 5000 이상이면 '고액연봉자', 아니면 공백을 출력하시오.
-
 DECLARE
     v_salary EMPLOYEES.SALARY%TYPE;
     v_result VARCHAR2(20);
 BEGIN
-    SELECT salary
-      INTO v_salary
+    SELECT salary INTO v_salary
       FROM employees
-     WHERE employee_id = 100;
+     WHERE employee_id = 200;
     IF v_salary >= 5000 THEN
         v_result := '고액연봉자';
     ELSE
-        v_result := ' ';
+        v_result := '';
     END IF;
     DBMS_OUTPUT.PUT_LINE('결과: ' || v_result);
 END;
+
 
 -- WHILE문
 -- 1 ~ 100까지 모두 더하기
 DECLARE
     n NUMBER(3);
     total NUMBER(4);
-BEGIN 
+BEGIN
     total := 0;
     n := 1;
     WHILE n <= 100 LOOP
@@ -148,6 +148,7 @@ BEGIN
     END LOOP;
     DBMS_OUTPUT.PUT_LINE('합계: ' || total);
 END;
+
 
 -- FOR문
 DECLARE
@@ -161,9 +162,11 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('합계: ' || total);
 END;
 
+
 -- EXIT문 (java의 break문)
 -- 1부터 누적합계를 구하다가 최초 누적합계가 3000 이상인 경우 반복문을 종료하고
 -- 해당 누적합계를 출력하시오.
+
 DECLARE
     n NUMBER;
     total NUMBER;
@@ -172,13 +175,28 @@ BEGIN
     n := 1;
     WHILE TRUE LOOP  -- 무한루프
         total := total + n;
-        /*IF total >= 3000 THEN
-            EXIT;*/
+        IF total >= 3000 THEN
+            EXIT;
+        END IF;
+        n := n + 1;
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE('합계: ' || total);
+END;
+
+DECLARE
+    n NUMBER;
+    total NUMBER;
+BEGIN
+    total := 0;
+    n := 1;
+    WHILE TRUE LOOP  -- 무한루프
+        total := total + n;
         EXIT WHEN total >= 3000;
         n := n + 1;
     END LOOP;
     DBMS_OUTPUT.PUT_LINE('합계: ' || total);
 END;
+
 
 -- CONTINUE문
 -- 1 ~ 100 사이 모든 짝수의 합계를 구하시오.
@@ -198,13 +216,14 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('짝수 합계: ' || total);
 END;
 
+
 -- 테이블 타입
 -- 테이블의 데이터를 가져와서 배열처럼 사용하는 타입
 DECLARE
     i NUMBER;  -- 인덱스
     -- first_name_type : EMPLOYEES테이블의 FIRST_NAME칼럼값을 배열처럼 사용할 수 있는 타입
     TYPE first_name_type IS TABLE OF EMPLOYEES.FIRST_NAME%TYPE INDEX BY BINARY_INTEGER;
-    -- first_names : EMPLOYEES테이블의 FIRST_NAME칼럼값을 실제로 저장하는 변수(배열)
+    -- first_names : EMPLOYEES테이블의 FIRST_NAME칼럽값을 실제로 저장하는 변수(배열)
     first_names first_name_type;
 BEGIN
     i := 0;
@@ -215,10 +234,11 @@ BEGIN
     END LOOP;
 END;
 
+
 -- 부서번호(department_id)가 50인 부서의 first_name, last_name을 가져와서
--- 새로운 테이블 employees50에 삽입하시오
+-- 새로운 테이블 employees50에 삽입하시오.
 CREATE TABLE employees50
-        AS (SELECT first_name, last_name FROM employees WHERE 1 = 0);
+    AS (SELECT first_name, last_name FROM employees WHERE 1 = 0);
 DECLARE
     v_first_name EMPLOYEES.FIRST_NAME%TYPE;
     v_last_name EMPLOYEES.LAST_NAME%TYPE;
@@ -232,6 +252,7 @@ BEGIN
 END;
 
 SELECT first_name, last_name FROM employees50;
+
 
 -- 레코드 타입
 -- 여러 칼럼(열)이 모여서 하나의 레코드(행, ROW)가 된다.
@@ -253,23 +274,23 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE(woman.my_name || ' ' || woman.my_age);
 END;
 
+
 -- 테이블형 레코드 타입
-TRUNCATE TABLE employees50;  -- 구조는 남기고, 레코드만 모두 삭제하기 (복구가 안됨)
--- 부서번호(department_id)가 50인 부서의 전체칼럼을 가져와서
--- 새로운 테이블 employees2에 삽입하시오
+-- 부서번호(department_id)가 50인 부서의 전체 칼럼을 가져와서
+-- 새로운 테이블 employees2에 삽입하시오.
 
 DROP TABLE employees2;
 
 CREATE TABLE employees2
     AS (SELECT * FROM employees WHERE 1 = 0);
 
-DECLARE 
+DECLARE
     row_data SPRING.EMPLOYEES%ROWTYPE;  -- EMPLOYEES테이블의 ROW전체를 저장할 수 있는 변수
     emp_id NUMBER(3);
 BEGIN
     FOR emp_id IN 100 .. 206 LOOP
         SELECT * INTO row_data
-          FROM EMPLOYEES
+          FROM SPRING.EMPLOYEES
          WHERE employee_id = emp_id;
         INSERT INTO employees2 VALUES row_data;
     END LOOP;
@@ -284,8 +305,9 @@ DECLARE
 BEGIN
     SELECT last_name INTO v_last_name
       FROM employees
-     WHERE department_id = 50;  -- 많은 사원
-     -- WHERE employee_id = 1;  -- 없는 사원
+     WHERE employee_id = 100;
+    -- WHERE department_id = 50;  -- 많은 사원
+    -- WHERE employee_id = 1;  -- 없는 사원
     DBMS_OUTPUT.PUT_LINE('결과: ' || v_last_name);
 EXCEPTION
     WHEN NO_DATA_FOUND THEN
@@ -293,17 +315,3 @@ EXCEPTION
     WHEN TOO_MANY_ROWS THEN
         DBMS_OUTPUT.PUT_LINE('해당 사원이 많다.');
 END;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
