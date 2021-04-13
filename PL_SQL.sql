@@ -229,13 +229,70 @@ BEGIN
         INSERT INTO employees50(first_name, last_name) VALUES (v_first_name, v_last_name);
     END LOOP;
     COMMIT;
-    SELECT first_name, last_name FROM employees50;
 END;
+
+SELECT first_name, last_name FROM employees50;
 
 -- 레코드 타입
 -- 여러 칼럼(열)이 모여서 하나의 레코드(행, ROW)가 된다.
 -- 여러 데이터를 하나로 모으는 개념 : 객체(변수 + 함수)의 하위 개념 -> 구조체(변수)
+DECLARE
+    TYPE person_type IS RECORD
+    (
+        my_name VARCHAR2(20),
+        my_age NUMBER(3)
+    );
+    man person_type;  -- person_type의 man
+    woman person_type;  -- person_type의 woman
+BEGIN
+    man.my_name := '제임스';
+    man.my_age := 20;
+    woman.my_name := '앨리스';
+    woman.my_age := 30;
+    DBMS_OUTPUT.PUT_LINE(man.my_name || ' ' || man.my_age);
+    DBMS_OUTPUT.PUT_LINE(woman.my_name || ' ' || woman.my_age);
+END;
 
+-- 테이블형 레코드 타입
+TRUNCATE TABLE employees50;  -- 구조는 남기고, 레코드만 모두 삭제하기 (복구가 안됨)
+-- 부서번호(department_id)가 50인 부서의 전체칼럼을 가져와서
+-- 새로운 테이블 employees2에 삽입하시오
+
+DROP TABLE employees2;
+
+CREATE TABLE employees2
+    AS (SELECT * FROM employees WHERE 1 = 0);
+
+DECLARE 
+    row_data SPRING.EMPLOYEES%ROWTYPE;  -- EMPLOYEES테이블의 ROW전체를 저장할 수 있는 변수
+    emp_id NUMBER(3);
+BEGIN
+    FOR emp_id IN 100 .. 206 LOOP
+        SELECT * INTO row_data
+          FROM EMPLOYEES
+         WHERE employee_id = emp_id;
+        INSERT INTO employees2 VALUES row_data;
+    END LOOP;
+END;
+
+SELECT first_name, last_name FROM employees2;
+
+
+-- 예외 처리
+DECLARE
+    v_last_name VARCHAR2(25);  -- 칼럼의 타입보다 크거나 같으면 이상이 없다.
+BEGIN
+    SELECT last_name INTO v_last_name
+      FROM employees
+     WHERE department_id = 50;  -- 많은 사원
+     -- WHERE employee_id = 1;  -- 없는 사원
+    DBMS_OUTPUT.PUT_LINE('결과: ' || v_last_name);
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('해당 사원이 없다.');
+    WHEN TOO_MANY_ROWS THEN
+        DBMS_OUTPUT.PUT_LINE('해당 사원이 많다.');
+END;
 
 
 
